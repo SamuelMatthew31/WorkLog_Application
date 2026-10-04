@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout('Tambah Proyek Baru', ~{::div#content})}">
+<body>
+<div id="content" class="row justify-content-center">
+
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Buat Proyek Baru</h5>
+            <form th:action="@{/projects}" th:object="${project}" method="post">
+
+                <div class="mb-3">
+                    <label for="name" class="form-label small fw-semibold">Nama Proyek</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Contoh: Modernisasi Website Klien" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{name}">Pesan Error</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label small fw-semibold">Deskripsi</label>
+                    <textarea th:field="*{description}" class="form-control" id="description" rows="4" placeholder="Jelaskan tujuan ringkas dari proyek ini..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/projects" class="btn btn-light btn-sm px-3">Batal</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Simpan Proyek</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

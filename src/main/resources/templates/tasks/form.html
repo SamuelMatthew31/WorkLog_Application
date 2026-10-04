@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout('Tambah Tugas Baru', ~{::div#content})}">
+<body>
+<div id="content" class="row justify-content-center">
+
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Buat Tugas Baru</h5>
+            <form th:action="@{/tasks}" th:object="${task}" method="post">
+
+                <div class="mb-3">
+                    <label for="project" class="form-label small fw-semibold">Pilih Proyek</label>
+                    <select th:field="*{project.id}" class="form-select" id="project" required>
+                        <option value="" disabled selected>-- Pilih Proyek --</option>
+                        <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="title" class="form-label small fw-semibold">Judul Tugas</label>
+                    <input type="text" th:field="*{title}" class="form-control" id="title" placeholder="Contoh: Implementasi Form Validasi" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{title}">Pesan Error</div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label for="priority" class="form-label small fw-semibold">Prioritas</label>
+                        <select th:field="*{priority}" class="form-select" id="priority">
+                            <option th:each="p : ${priorities}" th:value="${p}" th:text="${p.displayName}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="status" class="form-label small fw-semibold">Status Awal</label>
+                        <select th:field="*{status}" class="form-select" id="status">
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label small fw-semibold">Deskripsi Tugas</label>
+                    <textarea th:field="*{description}" class="form-control" id="description" rows="3" placeholder="Rincian mengenai tugas ini..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/projects" class="btn btn-light btn-sm px-3">Batal</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Simpan Tugas</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
