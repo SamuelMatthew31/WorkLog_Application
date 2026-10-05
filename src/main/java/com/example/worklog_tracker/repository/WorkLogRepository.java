@@ -15,4 +15,8 @@ public interface WorkLogRepository extends JpaRepository<WorkLog, Long> {
 
     @Query("SELECT COALESCE(SUM(w.durationMinutes), 0) FROM WorkLog w WHERE w.task.id = :taskId")
     Integer getTotalDurationByTaskId(@Param("taskId") Long taskId);
+
+    // Query agregat global untuk menghitung total seluruh durasi kerja dalam aplikasi
+    @Query("SELECT COALESCE(SUM(w.durationMinutes), 0) FROM WorkLog w")
+    Integer getTotalGlobalWorkMinutes();
 }

@@ -1,6 +1,6 @@
 # ⏱️ WorkLog Tracker
 
-**WorkLog Tracker** adalah aplikasi berbasis web yang dibangun dengan ekosistem Spring Boot dan Thymeleaf. Aplikasi ini dirancang untuk memudahkan individu maupun tim dalam melacak waktu (time tracking) yang dihabiskan untuk berbagai tugas dan proyek.
+**WorkLog Tracker** adalah aplikasi berbasis web yang dibangun dengan ekosistem Spring Boot dan Thymeleaf. Aplikasi ini dirancang untuk memudahkan individu maupun tim dalam melacak waktu (time tracking) yang dihabiskan untuk berbagai tugas dan proyek, memvisualisasikan progress melalui Kanban, serta memonitor tingkat produktivitas.
 
 Dokumen ini berfungsi ganda sebagai **Product Requirements Document (PRD)** sekaligus **Technical Documentation** untuk memberikan panduan komprehensif bagi developer, product manager, maupun pengguna saat mengakses repository ini.
 
@@ -9,34 +9,43 @@ Dokumen ini berfungsi ganda sebagai **Product Requirements Document (PRD)** seka
 ## 📋 Bagian 1: Product Requirements Document (PRD)
 
 ### 1.1 Latar Belakang
-Dalam manajemen proyek modern, mengelola waktu dan melihat alokasi jam kerja pada spesifik tugas merupakan hal krusial untuk evaluasi produktivitas. Tanpa sistem pelacakan yang baik, akan sulit untuk mengetahui berapa lama suatu tugas diselesaikan dan mengevaluasi alokasi sumber daya ke depannya. WorkLog Tracker hadir untuk memecahkan masalah pencatatan waktu manual dengan sistem yang terpusat, otomatis, dan mudah digunakan.
+Dalam manajemen proyek modern, mengelola waktu dan melihat alokasi jam kerja pada spesifik tugas merupakan hal krusial untuk evaluasi produktivitas. Tanpa sistem pelacakan yang baik, akan sulit untuk mengetahui berapa lama suatu tugas diselesaikan dan mengevaluasi alokasi sumber daya ke depannya. WorkLog Tracker hadir untuk memecahkan masalah pencatatan waktu manual dengan sistem yang terpusat, otomatis, visual (Kanban), dan mudah dikelola.
 
 ### 1.2 Tujuan Aplikasi
 - Menyediakan platform terpadu untuk membuat dan mengelola portofolio Proyek.
-- Memungkinkan pengguna memecah proyek menjadi Tugas (Tasks) yang memiliki parameter jelas seperti tingkat prioritas dan status progres.
+- Memungkinkan pengguna memecah proyek menjadi Tugas (Tasks) yang memiliki parameter jelas (seperti tingkat prioritas dan status progres) serta memvisualisasikannya di Papan Kanban.
 - Memfasilitasi pengguna untuk mencatat waktu kerja (WorkLogs) mereka di setiap tugas secara akurat dalam satuan menit.
+- Menyediakan statistik global tingkat tinggi (Dashboard) terkait produktivitas.
 
 ### 1.3 Target Pengguna
 - **Freelancer / Independent Contractor:** Untuk melacak *billable hours* yang akurat bagi klien.
-- **Software Engineer / Pekerja Profesional:** Untuk pencatatan *timesheet* internal harian.
-- **Project Manager:** Untuk memonitor progres penyelesaian tugas dan mengukur durasi pengerjaan oleh tim.
+- **Software Engineer / Pekerja Profesional:** Untuk pencatatan *timesheet* harian.
+- **Project Manager:** Untuk memonitor progres penyelesaian tugas melalui metrik Kanban dan mengevaluasi total durasi pengerjaan oleh tim.
 
 ### 1.4 Fitur Utama (Core Features)
-1. **Manajemen Proyek (Project Management):**
+1. **Global Dashboard & Statistics:**
+   - Halaman utama (Home) yang merangkum keseluruhan proyek, menampilkan total tugas, pemisahan status tugas (Completed, In Progress, Blocked), serta agregasi total menit kerja secara global.
+2. **Manajemen Proyek (Project Management):**
    - *Create, Read, Update, Delete (CRUD)* data Proyek.
-   - Entitas dengan atribut: Nama Proyek, Deskripsi, dan Tanggal Dibuat (otomatis).
-2. **Manajemen Tugas (Task Management):**
-   - *CRUD* Tugas dalam spesifik proyek.
-   - Entitas dengan atribut: Judul, Deskripsi, Status (`TODO`, `IN_PROGRESS`, `DONE`), Prioritas (`LOW`, `MEDIUM`, `HIGH`).
-3. **Pencatatan Waktu (Time Tracking / Work Log):**
-   - Menambahkan catatan kerja (log) langsung ke spesifik tugas.
-   - Entitas dengan atribut: Deskripsi Pekerjaan (aktivitas apa yang dilakukan), Durasi (dalam menit - tervalidasi minimal 1 menit), Waktu Log.
+   - Entitas dengan atribut: Nama Proyek, Deskripsi, dan Tanggal Dibuat.
+3. **Papan Kanban Proyek (Kanban Board View):**
+   - Tampilan visual board untuk setiap proyek, memetakan setiap tugas berdasarkan statusnya.
+   - Kemampuan pembaruan status cepat (Quick Update Status).
+4. **Manajemen Tugas Terintegrasi & Filter Pencarian (Task Management & Search):**
+   - *CRUD* Tugas dalam hierarki spesifik (nested) di bawah sebuah proyek.
+   - Halaman pencarian global untuk mencari tugas berdasar kata kunci (*keyword*), filter status, dan prioritas.
+   - Status meliputi: `TODO`, `IN_PROGRESS`, `DONE`, dan `BLOCKED` (Terkendala).
+   - Prioritas meliputi: `LOW`, `MEDIUM`, `HIGH`.
+5. **Pencatatan Waktu (Time Tracking / Work Log):**
+   - Menambahkan catatan kerja (log) ke spesifik tugas.
+   - Entitas dengan atribut: Deskripsi Pekerjaan, Durasi (dalam menit - minimal 1 menit), Waktu Log.
 
 ### 1.5 User Flow Singkat
-1. Pengguna membuka halaman utama, lalu menambahkan sebuah **Proyek** baru.
-2. Di dalam detail Proyek tersebut, pengguna membuat beberapa **Tugas (Task)** yang perlu diselesaikan.
-3. Saat pengguna mengerjakan tugas, mereka masuk ke detail Tugas dan menambahkan **WorkLog**, mencatat deskripsi pekerjaan serta durasi menit yang dihabiskan.
-4. Data WorkLog akan terakumulasi untuk memudahkan *tracking* pada tiap-tiap Tugas.
+1. Pengguna membuka aplikasi dan disajikan **Dashboard** yang berisi metrik ringkasan kinerja.
+2. Pengguna membuat sebuah **Proyek** baru, lalu masuk ke tampilan **Kanban Board** proyek tersebut.
+3. Di sana, pengguna membuat beberapa **Tugas (Task)** dengan prioritas tertentu.
+4. Pengguna dapat melacak seluruh pekerjaannya melalui halaman **Pencarian (Search)** lintas proyek.
+5. Saat pengguna mengerjakan tugas, status dapat diubah secara langsung. Setelah itu pengguna masuk ke detail Tugas dan menambahkan **WorkLog**, mencatat deskripsi pekerjaan serta durasi menit yang dihabiskan.
 
 ---
 
@@ -44,7 +53,7 @@ Dalam manajemen proyek modern, mengelola waktu dan melihat alokasi jam kerja pad
 
 ### 2.1 Arsitektur & Stack Teknologi (Tech Stack)
 - **Backend Framework:** Java 25, Spring Boot 4.1.1 (Spring Web MVC)
-- **ORM & Database:** Spring Data JPA, Hibernate, H2 Database (In-Memory Database untuk mode *development*)
+- **ORM & Database:** Spring Data JPA, Hibernate, H2 Database (In-Memory Database untuk *development*)
 - **View / Frontend:** Thymeleaf (Server-Side Rendering), HTML/CSS
 - **Tools / Libraries:** Lombok (Boilerplate reduction), Spring Boot Validation (Data Integrity API)
 - **Build Tool:** Maven
@@ -83,45 +92,46 @@ erDiagram
 ```
 
 #### Detail Entitas:
-- **`Project`**: Entitas tertinggi. Memiliki relasi *One-to-Many* ke entitas `Task` dengan fungsi *Cascade*. Jika proyek dihapus, seluruh task dan log di dalamnya ikut terhapus.
-- **`Task`**: Sub-entitas dari Project. Memiliki relasi *Many-to-One* ke `Project` dan *One-to-Many* ke `WorkLog`. Enum yang digunakan untuk status adalah `TaskStatus`, dan prioritas `TaskPriority`.
-- **`WorkLog`**: Mencatat setiap entri durasi pengerjaan. Memiliki relasi *Many-to-One* ke `Task`. Terdapat validasi *constraint* (durasi minimal 1 menit).
+- **`Project`**: Entitas tertinggi. Memiliki relasi *One-to-Many* ke entitas `Task` dengan *Cascade* (apabila proyek dihapus, seluruh task dan log di dalamnya ikut terhapus).
+- **`Task`**: Sub-entitas dari Project. Enum yang digunakan untuk status adalah `TaskStatus` (termasuk `BLOCKED`), dan prioritas `TaskPriority`.
+- **`WorkLog`**: Mencatat setiap entri durasi pengerjaan, berelasi *Many-to-One* ke `Task`.
 
 ### 2.3 Struktur Direktori (Folder Structure)
-Aplikasi dibangun mengikuti *pattern* standard arsitektur **MVC (Model-View-Controller)** khas ekosistem Spring Boot:
+Sistem menggunakan *pattern* standard arsitektur **MVC (Model-View-Controller)** dengan tambahan implementasi **DTO** untuk pergerakan data ke UI:
 
 ```text
 worklog-tracker/
-├── pom.xml                     # Konfigurasi Maven & dependencies
+├── pom.xml
 └── src/
     └── main/
         ├── java/com/example/worklog_tracker/
-        │   ├── controller/     # Layer routing HTTP (mengembalikan page Thymeleaf)
-        │   ├── model/          # Layer data (Entitas JPA, Enum untuk database schema)
-        │   ├── repository/     # Layer akses Database (Interface extends JpaRepository)
-        │   ├── service/        # Layer Business Logic (Jembatan antara Controller & Repository)
-        │   └── WorklogTrackerApplicat... # Entry point aplikasi (Main class Spring Boot)
+        │   ├── controller/     # Layer routing HTTP (menghubungkan ke Thymeleaf Views)
+        │   ├── dto/            # Data Transfer Objects (Contoh: DashboardStatsDto)
+        │   ├── model/          # Layer data (Entitas JPA, Enum)
+        │   ├── repository/     # Layer akses Database (Termasuk custom JPQL queries untuk pencarian)
+        │   └── service/        # Layer Business Logic (Seperti DashboardService untuk agregasi metrik)
         │
         └── resources/
-            ├── application.properties  # Konfigurasi environment & database (H2, Hibernate, Thymeleaf)
-            └── templates/              # File HTML dengan tag Thymeleaf
-                ├── layout/             # Template dasar UI (base layout/navigation)
-                ├── projects/           # Views untuk modul Proyek (list.html, form.html, detail.html)
-                └── tasks/              # Views untuk modul Tugas (form.html, detail.html)
+            ├── application.properties
+            └── templates/
+                ├── dashboard.html    # View Global Stats
+                ├── layout/           # Template dasar UI
+                ├── projects/         # Views modul Proyek (list, form, detail, kanban.html)
+                └── tasks/            # Views modul Tugas (form, detail, search.html)
 ```
 
 ### 2.4 API / Endpoint & Routing
-Meski menggunakan Thymeleaf (bukan pure REST API), berikut adalah peta routing Controller secara umum:
+Meski menggunakan *Server-Side Rendering*, API internal diatur secara RESTful (terutama *Nested Routes* untuk hierarki sumber daya):
 
-* **`ProjectController`**: Menangani route untuk UI Proyek (View all projects, Create Project, View Detail Project).
-* **`TaskController`**: Menangani route untuk Tugas (Create Task di dalam proyek, View Detail Task).
-* **`WorkLogController`**: Menangani form submission untuk menambah waktu pengerjaan/work log pada task tertentu.
+* **`HomeController`**: `/` -> Merender halaman Dashboard (`dashboard.html`).
+* **`ProjectController`**: `/projects` (List/Create), `/projects/{id}` (Detail), `/projects/{id}/kanban` (Board view dengan pengelompokan menggunakan Java Streams).
+* **`TaskController`**: Mengadopsi **Nested Routing** (`/projects/{projectId}/tasks/...`) untuk modifikasi task yang spesifik pada suatu proyek. Terdapat juga `/tasks/search` yang menggunakan pencarian JPQL dinamis lintas-proyek (Global Search).
+* **`WorkLogController`**: Mengelola form submission untuk entri pengerjaan di suatu task.
 
 ### 2.5 Instalasi & Cara Menjalankan (Installation & Setup)
 
 #### Prasyarat (Prerequisites)
 - Java Development Kit (JDK) versi **25**.
-- (Maven sudah disertakan dalam repositori melalui `mvnw` wrapper).
 
 #### Langkah-langkah:
 1. **Clone Repository**
@@ -131,31 +141,18 @@ Meski menggunakan Thymeleaf (bukan pure REST API), berikut adalah peta routing C
    ```
 
 2. **Kompilasi & Build Aplikasi**
-   Unduh semua dependency dan pastikan aplikasi bisa di-build dengan lancar.
-   - Di OS Windows:
-     ```cmd
-     .\mvnw.cmd clean install
-     ```
-   - Di OS Mac/Linux:
-     ```bash
-     ./mvnw clean install
-     ```
+   - Di OS Windows: `.\mvnw.cmd clean install`
+   - Di OS Mac/Linux: `./mvnw clean install`
 
 3. **Jalankan Aplikasi**
-   Jalankan server Spring Boot yang juga akan menginisialisasi database H2 secara otomatis berdasarkan anotasi Entity (`ddl-auto=update`).
-   - Di OS Windows:
-     ```cmd
-     .\mvnw.cmd spring-boot:run
-     ```
-   - Di OS Mac/Linux:
-     ```bash
-     ./mvnw spring-boot:run
-     ```
+   Aplikasi dan database otomatis diinisialisasi melalui anotasi Entity.
+   - Di OS Windows: `.\mvnw.cmd spring-boot:run`
+   - Di OS Mac/Linux: `./mvnw spring-boot:run`
 
 4. **Akses Aplikasi**
-   - Web App UI: Buka browser dan arahkan ke `http://localhost:8080`.
-   - Database H2 Console: Buka `http://localhost:8080/h2-console`.
-     *(Konfigurasi Console: Driver Class: `org.h2.Driver`, JDBC URL: `jdbc:h2:mem:worklogdb`, Username: `sa`, Password dibiarkan kosong).*
+   - Web App UI (Dashboard Home): `http://localhost:8080`
+   - Database H2 Console: `http://localhost:8080/h2-console`
+     *(Konfigurasi Console - JDBC URL: `jdbc:h2:mem:worklogdb`, Username: `sa`, Password kosong).*
 
 ---
 *Dibuat untuk mempermudah pemahaman arsitektur dan kegunaan aplikasi WorkLog Tracker.*

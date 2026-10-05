@@ -1,13 +1,17 @@
 package com.example.worklog_tracker.controller;
 
 import com.example.worklog_tracker.model.Project;
+import com.example.worklog_tracker.model.Task;
+import com.example.worklog_tracker.model.TaskStatus;
 import com.example.worklog_tracker.service.ProjectService;
 import com.example.worklog_tracker.service.TaskService;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects")
@@ -21,45 +25,72 @@ public class ProjectController {
         this.taskService = taskService;
     }
 
-    // Menampilkan daftar semua proyek
     @GetMapping
     public String listProjects(Model model) {
         model.addAttribute("projects", projectService.findAll());
         return "projects/list";
     }
 
-    // Menampilkan form pembuatan proyek baru
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("project", new Project());
         return "projects/form";
     }
 
-    // Memproses simpan proyek baru
     @PostMapping
-    public String saveProject(@Valid @ModelAttribute("project") Project project,
-                              BindingResult bindingResult,
-                              Model model) {
-        if (bindingResult.hasErrors()) {
-            return "projects/form";
-        }
+    public String saveProject(@ModelAttribute Project project) {
         projectService.save(project);
         return "redirect:/projects";
     }
 
-    // Menampilkan detail proyek beserta daftar tugas di dalamnya
     @GetMapping("/{id}")
-    public String viewProjectDetail(@PathVariable("id") Long id, Model model) {
+    public String showDetail(@PathVariable Long id, Model model) {
         Project project = projectService.findById(id);
         model.addAttribute("project", project);
-        model.addAttribute("tasks", taskService.findByProjectId(id));
         return "projects/detail";
     }
 
-    // Menghapus proyek
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Project project = projectService.findById(id);
+        model.addAttribute("project", project);
+        return "projects/form";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateProject(@PathVariable Long id, @ModelAttribute Project project) {
+        project.setId(id);
+        projectService.save(project);
+        return "redirect:/projects/" + id;
+    }
+
     @PostMapping("/{id}/delete")
-    public String deleteProject(@PathVariable("id") Long id) {
+    public String deleteProject(@PathVariable Long id) {
         projectService.deleteById(id);
         return "redirect:/projects";
+    }
+
+    // Handler Menampilkan Papan Kanban Proyek
+    @GetMapping("/{id}/kanban")
+    public String showKanbanBoard(@PathVariable Long id, Model model) {
+        Project project = projectService.findById(id);
+
+        // Pengelompokkan Tugas berdasarkan Status menggunakan Java Stream
+        Map<TaskStatus, List<Task>> tasksByStatus = project.getTasks().stream()
+                .collect(Collectors.groupingBy(Task::getStatus));
+
+        model.addAttribute("project", project);
+        model.addAttribute("kanbanMap", tasksByStatus);
+        model.addAttribute("allStatuses", TaskStatus.values());
+        return "projects/kanban";
+    }
+
+    // Handler Pembaruan Status Cepat dari Kanban
+    @PostMapping("/{projectId}/tasks/{taskId}/status")
+    public String updateStatusQuick(@PathVariable Long projectId,
+                                    @PathVariable Long taskId,
+                                    @RequestParam TaskStatus newStatus) {
+        taskService.updateTaskStatus(taskId, newStatus);
+        return "redirect:/projects/" + projectId + "/kanban";
     }
 }

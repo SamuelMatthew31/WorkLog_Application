@@ -1,87 +1,86 @@
 package com.example.worklog_tracker.controller;
 
+import com.example.worklog_tracker.model.Project;
 import com.example.worklog_tracker.model.Task;
 import com.example.worklog_tracker.model.TaskPriority;
 import com.example.worklog_tracker.model.TaskStatus;
-import com.example.worklog_tracker.model.WorkLog;
 import com.example.worklog_tracker.service.ProjectService;
 import com.example.worklog_tracker.service.TaskService;
-import com.example.worklog_tracker.service.WorkLogService;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
     private final ProjectService projectService;
-    private final WorkLogService workLogService;
 
-    public TaskController(TaskService taskService, ProjectService projectService, WorkLogService workLogService) {
+    public TaskController(TaskService taskService, ProjectService projectService) {
         this.taskService = taskService;
         this.projectService = projectService;
-        this.workLogService = workLogService;
     }
 
-    // Menampilkan form pembuatan tugas baru
-    @GetMapping("/new")
-    public String showCreateForm(@RequestParam(value = "projectId", required = false) Long projectId, Model model) {
+    @GetMapping("/projects/{projectId}/tasks/new")
+    public String showCreateTaskForm(@PathVariable Long projectId, Model model) {
+        Project project = projectService.findById(projectId);
         Task task = new Task();
-        if (projectId != null) {
-            task.setProject(projectService.findById(projectId));
-        }
+        task.setProject(project);
 
         model.addAttribute("task", task);
-        model.addAttribute("projects", projectService.findAll());
+        model.addAttribute("projectId", projectId);
         model.addAttribute("statuses", TaskStatus.values());
         model.addAttribute("priorities", TaskPriority.values());
         return "tasks/form";
     }
 
-    // Memproses simpan tugas baru
-    @PostMapping
-    public String saveTask(@Valid @ModelAttribute("task") Task task,
-                           BindingResult bindingResult,
-                           Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("projects", projectService.findAll());
-            model.addAttribute("statuses", TaskStatus.values());
-            model.addAttribute("priorities", TaskPriority.values());
-            return "tasks/form";
-        }
-        Task savedTask = taskService.save(task);
-        return "redirect:/projects/" + savedTask.getProject().getId();
-    }
-
-    // Menampilkan detail tugas beserta log waktu pengerjaannya
-    @GetMapping("/{id}")
-    public String viewTaskDetail(@PathVariable("id") Long id, Model model) {
-        Task task = taskService.findById(id);
-        model.addAttribute("task", task);
-        model.addAttribute("workLogs", workLogService.findByTaskId(id));
-        model.addAttribute("totalDuration", workLogService.getTotalDurationForTask(id));
-        model.addAttribute("newWorkLog", new WorkLog());
-        model.addAttribute("statuses", TaskStatus.values());
-        return "tasks/detail";
-    }
-
-    // Mengubah status tugas secara cepat (pilihan opsi drop-down)
-    @PostMapping("/{id}/status")
-    public String updateStatus(@PathVariable("id") Long id, @RequestParam("status") TaskStatus status) {
-        taskService.updateStatus(id, status);
-        return "redirect:/tasks/" + id;
-    }
-
-    // Menghapus tugas
-    @PostMapping("/{id}/delete")
-    public String deleteTask(@PathVariable("id") Long id) {
-        Task task = taskService.findById(id);
-        Long projectId = task.getProject().getId();
-        taskService.deleteById(id);
+    @PostMapping("/projects/{projectId}/tasks")
+    public String saveTask(@PathVariable Long projectId, @ModelAttribute Task task) {
+        Project project = projectService.findById(projectId);
+        task.setProject(project);
+        taskService.save(task);
         return "redirect:/projects/" + projectId;
+    }
+
+    @GetMapping("/projects/{projectId}/tasks/{taskId}/edit")
+    public String showEditTaskForm(@PathVariable Long projectId, @PathVariable Long taskId, Model model) {
+        Task task = taskService.findById(taskId);
+        model.addAttribute("task", task);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("statuses", TaskStatus.values());
+        model.addAttribute("priorities", TaskPriority.values());
+        return "tasks/form";
+    }
+
+    @PostMapping("/projects/{projectId}/tasks/{taskId}/edit")
+    public String updateTask(@PathVariable Long projectId,
+                             @PathVariable Long taskId,
+                             @ModelAttribute Task task) {
+        Project project = projectService.findById(projectId);
+        task.setId(taskId);
+        task.setProject(project);
+        taskService.save(task);
+        return "redirect:/projects/" + projectId;
+    }
+
+    // Handler Endpoint Search & Filter Tugas
+    @GetMapping("/tasks/search")
+    public String searchTasks(@RequestParam(required = false) String keyword,
+                              @RequestParam(required = false) TaskStatus status,
+                              @RequestParam(required = false) TaskPriority priority,
+                              Model model) {
+
+        List<Task> tasks = taskService.searchTasks(keyword, status, priority);
+
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedPriority", priority);
+        model.addAttribute("statuses", TaskStatus.values());
+        model.addAttribute("priorities", TaskPriority.values());
+
+        return "tasks/search";
     }
 }
